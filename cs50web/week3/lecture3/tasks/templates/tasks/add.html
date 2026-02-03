@@ -1,16 +1,10 @@
-{% load static %}
+{% extends "tasks/layout.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <title>Add Task</title>
-</head>
-
-<body>
+{% block body %}
     <h1>Add Task </h1>
-    <input type="text" name="task">
-    <input type="submit">
-</body>
-
-</html>
+    <form>
+        <input type="text" name="task">
+        <input type="submit">
+    </form>
+    <a href="{% url 'index' %}">View Tasks</a>
+{% endblock %}
