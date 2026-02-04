@@ -7,14 +7,15 @@ from . import util
 import markdown2
 
 def index(request):
+    print(util.list_entries())
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
 
 def show_entries(request,entry_name):
-    # print("entry_name is:", entry_name)
+    print("entry_name is:", entry_name)
     entry_info = util.get_entry(entry_name)
-    # print(entry_info)
+    print(entry_info)
     if entry_info:
         return render(request, "encyclopedia/entrypage.html",{
             "name": entry_name,
@@ -25,24 +26,27 @@ def show_entries(request,entry_name):
     
 def search(request):
     if request.method == "POST":
-        entry_list = list(map(lambda x: x.upper(),util.list_entries()))
-        print(entry_list)
+        entry_list = util.list_entries()
+        entry_list_upper = list(map(lambda x: x.upper(),entry_list))
+        #print(entry_list_upper)
         form = request.POST['q'].upper()
-        print("form is:",type(form))
-        if form != "" and form in entry_list:
-            return HttpResponseRedirect(f"/{form}")
+        #print("form is:",type(form))
+        if form != "" and form in entry_list_upper:
+            return HttpResponseRedirect(f"/encyclopedia/{form}")
         elif form == "":
             return HttpResponseRedirect(reverse("index"))
         else:
             new_form = []
-            for i in entry_list:
-                if form in i:
-                    new_form.append(i)
+            for i in range(len(entry_list_upper)):
+                if form in entry_list_upper[i]:
+                    new_form.append(entry_list[i])
             if new_form == []:
                 return HttpResponse(f"Hey, cant find it")
             else:
-                return HttpResponse(f"{new_form}")
+                return render(request, "encyclopedia/search_result.html",{
+                    "query":request.POST['q'],
+                    "result":new_form
+                })
 
     else:
         return HttpResponse(f"This is the search engine! However you should not type the url manually")
-    pass
