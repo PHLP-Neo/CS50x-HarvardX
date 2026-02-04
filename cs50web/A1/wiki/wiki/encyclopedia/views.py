@@ -32,7 +32,9 @@ def search(request):
         form = request.POST['q'].upper()
         #print("form is:",type(form))
         if form != "" and form in entry_list_upper:
-            return HttpResponseRedirect(f"/encyclopedia/{form}")
+            # return HttpResponseRedirect(f"/wiki/{form}")
+            return HttpResponseRedirect(reverse("encyclopedia:show_entries", kwargs={"entry_name":form}))
+        # https://stackoverflow.com/questions/58387545/django-reverse-dynamic-urls-with-multiple-arguments-using-django-views
         elif form == "":
             return HttpResponseRedirect(reverse("index"))
         else:
