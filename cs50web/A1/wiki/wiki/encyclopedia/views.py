@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from django.http import HttpResponse
 from . import util
 
 import markdown2
@@ -18,3 +18,5 @@ def show_entries(request,entry_name):
             "name": entry_name,
             "content": markdown2.markdown(entry_info)
         })
+    else:
+        return HttpResponse(f"Hello, the page \"{entry_name}\" is not available!")
