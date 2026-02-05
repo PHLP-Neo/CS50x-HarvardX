@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from . import util
-
+import random
 import markdown2
 
 def index(request):
@@ -89,3 +89,9 @@ def edit(request):
     else:
         print("this is edit")
         return HttpResponse("edit in progress")
+    
+def rand(request):
+    entry_list = util.list_entries()
+    random_select = random.choice(entry_list)
+    return HttpResponseRedirect(reverse("encyclopedia:show_entries", kwargs={"entry_name":random_select}))
+    #return HttpResponse("random page in progress")
