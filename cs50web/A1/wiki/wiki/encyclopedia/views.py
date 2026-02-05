@@ -7,7 +7,7 @@ from . import util
 import markdown2
 
 def index(request):
-    print(util.list_entries())
+    #print(util.list_entries())
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
     })
@@ -36,7 +36,7 @@ def search(request):
             return HttpResponseRedirect(reverse("encyclopedia:show_entries", kwargs={"entry_name":form}))
         # https://stackoverflow.com/questions/58387545/django-reverse-dynamic-urls-with-multiple-arguments-using-django-views
         elif form == "":
-            return HttpResponseRedirect(reverse("index"))
+            return HttpResponseRedirect(reverse("encyclopedia:index"))
         else:
             new_form = []
             for i in range(len(entry_list_upper)):
@@ -52,3 +52,20 @@ def search(request):
 
     else:
         return HttpResponse(f"This is the search engine! However you should not type the url manually")
+    
+def new(request):
+    if request.method == "POST":
+        #print("I got this!")
+        form = request.POST
+        title = form.get("title")
+        content = form.get("content")
+        if title not in util.list_entries():
+            util.save_entry(title, content)
+            return HttpResponseRedirect(reverse("encyclopedia:show_entries", kwargs={"entry_name":title}))
+        else:
+            return HttpResponse(f"No overwrite entry!")
+    else:
+        print("this is form")
+        return render(request, "encyclopedia/new.html", {
+            "entries": util.list_entries()
+        })
