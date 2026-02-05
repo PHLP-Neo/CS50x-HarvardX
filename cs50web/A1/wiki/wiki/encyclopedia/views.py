@@ -69,3 +69,23 @@ def new(request):
         return render(request, "encyclopedia/new.html", {
             "entries": util.list_entries()
         })
+    
+def edit(request):
+    if request.method == "POST":
+        form = request.POST
+        print("title is:",form.get("title"))
+        print("content is:",form.get("content"))
+        title = form.get("title")
+        content = form.get("content")
+        page = form.get("page")
+        if page=="entry":
+            return render(request, "encyclopedia/edit.html", {
+                "title":title,
+                "content":content
+            })
+        else:
+            util.save_entry(title, content)
+            return HttpResponseRedirect(reverse("encyclopedia:show_entries", kwargs={"entry_name":title}))
+    else:
+        print("this is edit")
+        return HttpResponse("edit in progress")
