@@ -1,10 +1,17 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-<div style="display: flex; flex-direction: row;">
+<div style="display: flex; flex-direction: row; justify-content: space-between">
     <h2>Active Listings</h2>
-    <p style="text-align:right">Add New listing</p>
+    <a href = "{% url 'new_listing' %}">Add New listing</a>
 </div>
 
-    
+<ul>
+{% for listing in listings%}
+<li>{{listing}}</li>
+{% empty %}
+<li>No listing</li>
+{%endfor%}
+</ul>
+
 {% endblock %}
