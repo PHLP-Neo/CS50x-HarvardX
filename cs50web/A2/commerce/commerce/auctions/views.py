@@ -3,7 +3,8 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import User, Auction_Listing
 
 
@@ -30,7 +31,17 @@ def login_view(request):
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "auctions/login.html")
+        message = ""
+        try:
+            code = request.GET.get('s', '')
+            if code == "t":
+                message = "This feature is for logged-in users only."
+        except:
+            pass
+        finally:
+            return render(request, "auctions/login.html",{
+                "message":message
+            })
 
 
 def logout_view(request):
@@ -64,5 +75,6 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+@login_required(login_url="/login?s=t")
 def new_listing(request):
-    pass
+    return HttpResponse("Huh, I guess you have loged in")
