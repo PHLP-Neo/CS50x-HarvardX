@@ -77,4 +77,15 @@ def register(request):
 
 @login_required(login_url="/login?s=t")
 def new_listing(request):
-    return HttpResponse("Huh, I guess you have loged in")
+    if request.method == "POST":
+        name = request.POST["Name"]
+        desc = request.POST["Desc"]
+        cat_imt = request.POST["Cat_Image"]
+        list_img = request.POST["Lis_Image"]
+        Starting_bid = request.POST["Starting_Bid"]
+        new_listing = Auction_Listing(title=name, description = desc, listing_image_link = list_img, category_image_link = cat_imt, bid_price = Starting_bid)
+        new_listing.save()
+        return HttpResponseRedirect(reverse("index"))
+
+    else:
+        return render(request, "auctions/new_listing.html")
