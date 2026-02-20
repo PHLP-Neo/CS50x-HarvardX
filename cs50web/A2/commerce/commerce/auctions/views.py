@@ -98,10 +98,10 @@ def show_listing(request, listing_id):
         return HttpResponse(f"I dont know how you get here, but this entry ({listing_id}) does not exist")
     try:
         comments = Comments.objects.filter(comment_listing = listing)
-        print(comments)
+        #print(comments)
     except:
         comments = False
-        print("comment gather failed")
+        #print("comment gather failed")
     return render(request, "auctions/ind_listing.html", {
         "listing":listing,
         "comments":comments
@@ -129,14 +129,6 @@ def new_bids(request):
         return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
     
 @login_required(login_url="/login?s=t")
-# class Comments(models.Model):
-#     comment_owner = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
-#     comment_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
-#     comment_text = models.TextField(default="")
-#     comment_time = models.DateTimeField(default=now)
-#     def __str__(self):
-#         return f"{self.bid_time}: {self.bid_owner} placed {self.bid_price} on {self.bid_listing}"
-#     pass
 def new_comment(request):
     if request.method == "POST":
         user = request.user
@@ -153,17 +145,41 @@ def new_comment(request):
     else:
         return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
     
+@login_required(login_url="/login?s=t")
 def close_poll(request):
     if request.method == "POST":
         listing_id = request.POST["bid_id"]
         listing = Auction_Listing.objects.get(id=listing_id)
         highest_price = listing.bid_price
         winning_bid = Bids.objects.filter(Q(bid_listing = listing) & Q(bid_price = highest_price)).first()
-        print(winning_bid)
+        #print(winning_bid)
         bid_winner = winning_bid.bid_owner
         listing.winner = bid_winner
         listing.save()
         return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
     else:
         return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
-    
+
+@login_required(login_url="/login?s=t")
+def add_to_fav(request):
+    # class Favorite(models.Model):
+    # fav_user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
+    # fav_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
+    # def __str__(self):
+    #     return f"{self.fav_user} starred {self.fav_listing}"
+    if request.method == "POST":
+        listing_id = request.POST["bid_id"]
+        listing = Auction_Listing.objects.get(id=listing_id)
+        user = request.user
+        user.watchlist.add(listing)
+        return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
+    else:
+        return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
+
+@login_required(login_url="/login?s=t")
+def my_fav(request):
+    user = request.user
+    return render(request, "auctions/my_favorite.html", {
+        "favorites":user.watchlist.all()
+    })
+        

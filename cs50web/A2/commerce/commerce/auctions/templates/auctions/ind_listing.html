@@ -16,10 +16,14 @@
 <h4>Current Price: {{listing.bid_price}} USD!</h4>
 <h5>Owner: {{listing.owner}}</h5>
 
-
-{% if listing.winner is None %}
-
 {% if user.is_authenticated %}
+<form action="{% url 'add_to_fav' %}" method="post">
+    {% csrf_token %}<input type="hidden" name="bid_id" value={{listing.id}}>
+    <div>
+        <input class="btn btn-primary" type="Submit" value="Add to Favorite">
+    </div>
+</form>
+{% if listing.winner is None %}
 
 {% for message in messages %}
 <p>{{message}}</p>
