@@ -83,9 +83,20 @@ def new_listing(request):
         cat_imt = request.POST["Cat_Image"]
         list_img = request.POST["Lis_Image"]
         Starting_bid = request.POST["Starting_Bid"]
-        new_listing = Auction_Listing(title=name, description = desc, listing_image_link = list_img, category_image_link = cat_imt, bid_price = Starting_bid)
+        user = request.user
+        new_listing = Auction_Listing(title=name, description = desc, listing_image_link = list_img, category_image_link = cat_imt, bid_price = Starting_bid, owner = user)
         new_listing.save()
         return HttpResponseRedirect(reverse("index"))
 
     else:
         return render(request, "auctions/new_listing.html")
+
+def show_listing(request, listing_id):
+    try:
+        listing = Auction_Listing.objects.get(id=listing_id)
+    except:
+        return HttpResponse(f"I dont know how you get here, but this entry ({listing_id}) does not exist")
+    return render(request, "auctions/ind_listing.html", {
+        "listing":listing
+    })
+    return HttpResponse(f"This is an under construction page for '{listing}'")

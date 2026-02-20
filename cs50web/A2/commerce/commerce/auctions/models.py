@@ -11,7 +11,7 @@ class Auction_Listing(models.Model):
     listing_image_link = models.URLField(blank=True, null=True)
     category_image_link = models.URLField(blank=True, null=True)
     bid_price= models.IntegerField()
-    
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     def __str__(self):
         return f"{self.title} is bidding at the price of {self.bid_price}!"
 

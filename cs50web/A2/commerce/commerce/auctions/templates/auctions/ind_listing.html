@@ -1,0 +1,18 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<h2>{{listing.title}}</h2>
+<p>{{listing.description}}</p>
+
+{% if listing.listing_image_link is not None and listing.listing_image_link != ""%}
+<img src="{{ listing.listing_image_link }}">
+{% endif %}
+
+{% if listing.category_image_link is not None and listing.category_image_link != "" %}
+<img src="{{ listing.category_image_link }}">
+<p>{{listing.category_image_link}}</p>
+{% endif %}
+
+<h4>Current Price: {{listing.bid_price}} USD!</h4>
+<h5>Owner: {{listing.owner}}</h5>
+{% endblock %}

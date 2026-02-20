@@ -8,7 +8,7 @@
 
 <ul>
 {% for listing in listings%}
-<li>{{listing}}</li>
+<li><a href="{% url 'show_listing' listing.id %}">{{listing}}</a></li>
 {% empty %}
 <li>No listing</li>
 {%endfor%}
