@@ -5,7 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User, Auction_Listing
+from django.utils.timezone import now
+from .models import User, Auction_Listing, Bids, Comments
 
 
 def index(request):
@@ -80,11 +81,11 @@ def new_listing(request):
     if request.method == "POST":
         name = request.POST["Name"]
         desc = request.POST["Desc"]
-        cat_imt = request.POST["Cat_Image"]
+        category = request.POST["Category"]
         list_img = request.POST["Lis_Image"]
         Starting_bid = request.POST["Starting_Bid"]
         user = request.user
-        new_listing = Auction_Listing(title=name, description = desc, listing_image_link = list_img, category_image_link = cat_imt, bid_price = Starting_bid, owner = user)
+        new_listing = Auction_Listing(title=name, description = desc, listing_image_link = list_img, category = category, bid_price = Starting_bid, owner = user)
         new_listing.save()
         return HttpResponseRedirect(reverse("index"))
 
@@ -99,4 +100,25 @@ def show_listing(request, listing_id):
     return render(request, "auctions/ind_listing.html", {
         "listing":listing
     })
-    return HttpResponse(f"This is an under construction page for '{listing}'")
+    #return HttpResponse(f"This is an under construction page for '{listing}'")
+
+@login_required(login_url="/login?s=t")
+def new_bids(request):
+    if request.method == "POST":
+        current_high_price = request.POST["current_price"]
+        price = request.POST["bid_price"]
+        date = now().date()
+        user = request.user
+        listing_id = request.POST["bid_id"]
+        listing = Auction_Listing.objects.get(id=listing_id)
+        if (price > current_high_price):
+            new_bid = Bids(bid_owner = user, bid_listing = listing, bid_time = date, bid_price = price)
+            listing.bid_price = price
+            listing.save()
+            new_bid.save()
+            return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
+        else:
+            messages.error(request, "Higher Bids already exist, refresh page to check higher bids.")
+            return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
+    else:
+        return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")

@@ -15,4 +15,25 @@
 
 <h4>Current Price: {{listing.bid_price}} USD!</h4>
 <h5>Owner: {{listing.owner}}</h5>
+
+{% if user.is_authenticated %}
+{% for message in messages %}
+<p>{{message}}</p>
+{% endfor %}
+<form action="{% url 'new_bids' %}" method="post">
+    {% csrf_token %}
+    <p>Bid price:</p>
+    <div class="form-group">
+        <input autofocus class="form-control" type="number" name="bid_price" placeholder={{listing.bid_price}} required>
+    </div>
+    <input type="hidden" name="current_price" value={{listing.bid_price}}>
+    <input type="hidden" name="bid_id" value={{listing.id}}>
+    <div>
+        <input class="btn btn-primary" type="submit" value="Submit">
+    </div>
+</form>
+{% else %}
+<p><a href="{% url 'login' %}">log in to view hidden content</a></p>
+{% endif %}
+
 {% endblock %}
