@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.timezone import now
 
 class User(AbstractUser):
+    watchlist = models.ManyToManyField('Auction_Listing', related_name="watchedby")
     pass
 
 class Auction_Listing(models.Model):
@@ -20,7 +21,7 @@ class Bids(models.Model):
     bid_owner = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
     bid_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
     bid_price = models.IntegerField(default=0)
-    bid_time = models.DateTimeField(default=now().date())
+    bid_time = models.DateTimeField(default=now())
     def __str__(self):
         return f"{self.bid_time}: {self.bid_owner} placed {self.bid_price} on {self.bid_listing}"
     pass
@@ -29,7 +30,7 @@ class Comments(models.Model):
     comment_owner = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
     comment_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
     comment_text = models.TextField(default="")
-    comment_time = models.DateTimeField(default=now().date())
+    comment_time = models.DateTimeField(default=now())
     def __str__(self):
-        return f"{self.bid_time}: {self.bid_owner} placed {self.bid_price} on {self.bid_listing}"
+        return f"{self.comment_owner}({self.comment_time}): {self.comment_text}"
     pass

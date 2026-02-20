@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils.timezone import now
-from .models import User, Auction_Listing, Bids, Comments
-
+from .models import User, Auction_Listing, Bids, Bids, Comments
+from django.db.models import Q
 
 def index(request):
     return render(request, "auctions/index.html",{
@@ -88,7 +88,6 @@ def new_listing(request):
         new_listing = Auction_Listing(title=name, description = desc, listing_image_link = list_img, category = category, bid_price = Starting_bid, owner = user)
         new_listing.save()
         return HttpResponseRedirect(reverse("index"))
-
     else:
         return render(request, "auctions/new_listing.html")
 
@@ -97,20 +96,26 @@ def show_listing(request, listing_id):
         listing = Auction_Listing.objects.get(id=listing_id)
     except:
         return HttpResponse(f"I dont know how you get here, but this entry ({listing_id}) does not exist")
+    try:
+        comments = Comments.objects.filter(comment_listing = listing)
+        print(comments)
+    except:
+        comments = False
+        print("comment gather failed")
     return render(request, "auctions/ind_listing.html", {
-        "listing":listing
+        "listing":listing,
+        "comments":comments
     })
-    #return HttpResponse(f"This is an under construction page for '{listing}'")
 
 @login_required(login_url="/login?s=t")
 def new_bids(request):
     if request.method == "POST":
-        current_high_price = request.POST["current_price"]
-        price = request.POST["bid_price"]
-        date = now().date()
-        user = request.user
         listing_id = request.POST["bid_id"]
         listing = Auction_Listing.objects.get(id=listing_id)
+        current_high_price = listing.bid_price
+        price = int(request.POST["bid_price"])
+        date = now()
+        user = request.user
         if (price > current_high_price):
             new_bid = Bids(bid_owner = user, bid_listing = listing, bid_time = date, bid_price = price)
             listing.bid_price = price
@@ -122,3 +127,43 @@ def new_bids(request):
             return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
     else:
         return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
+    
+@login_required(login_url="/login?s=t")
+# class Comments(models.Model):
+#     comment_owner = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
+#     comment_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
+#     comment_text = models.TextField(default="")
+#     comment_time = models.DateTimeField(default=now)
+#     def __str__(self):
+#         return f"{self.bid_time}: {self.bid_owner} placed {self.bid_price} on {self.bid_listing}"
+#     pass
+def new_comment(request):
+    if request.method == "POST":
+        user = request.user
+        listing_id = request.POST["bid_id"]
+        listing = Auction_Listing.objects.get(id=listing_id)
+        comment_text = request.POST["content"]
+        time = now()
+        new_comment = Comments(comment_owner = user,
+                               comment_listing = listing,
+                               comment_text = comment_text,
+                               comment_time = time)
+        new_comment.save()
+        return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
+    else:
+        return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
+    
+def close_poll(request):
+    if request.method == "POST":
+        listing_id = request.POST["bid_id"]
+        listing = Auction_Listing.objects.get(id=listing_id)
+        highest_price = listing.bid_price
+        winning_bid = Bids.objects.filter(Q(bid_listing = listing) & Q(bid_price = highest_price)).first()
+        print(winning_bid)
+        bid_winner = winning_bid.bid_owner
+        listing.winner = bid_winner
+        listing.save()
+        return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
+    else:
+        return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
+    
