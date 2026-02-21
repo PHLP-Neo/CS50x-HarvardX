@@ -17,48 +17,63 @@
 <h5>Owner: {{listing.owner}}</h5>
 
 {% if user.is_authenticated %}
-<form action="{% url 'add_to_fav' %}" method="post">
-    {% csrf_token %}<input type="hidden" name="bid_id" value={{listing.id}}>
-    <div>
-        <input class="btn btn-primary" type="Submit" value="Add to Favorite">
-    </div>
-</form>
-{% if listing.winner is None %}
+    {% if not watchlist %}
+    <form action="{% url 'add_to_fav' %}" method="post">
+        {% csrf_token %}<input type="hidden" name="bid_id" value={{listing.id}}>
+        <div>
+            <input class="btn btn-primary" type="Submit" value="Add to Favorite">
+        </div>
+    </form>
+    {% else %}
+    <form action="{% url 'remove_from_fav' %}" method="post">
+        {% csrf_token %}<input type="hidden" name="bid_id" value={{listing.id}}>
+        <div>
+            <input class="btn btn-primary" type="Submit" value="Remove From Favorite">
+        </div>
+    </form>
+    {% endif %}
 
-{% for message in messages %}
-<p>{{message}}</p>
-{% endfor %}
+    {% if listing.winner is None %}
 
-<form action="{% url 'new_bids' %}" method="post">
-    {% csrf_token %}
-    <p>Bid price:</p>
-    <div class="form-group">
-        <input size = "10" autofocus type="number" name="bid_price" placeholder={{listing.bid_price}} required>
-    </div>
-    <input type="hidden" name="bid_id" value={{listing.id}}>
-    <div>
-        <input class="btn btn-primary" type="Submit" value="Bid!">
-    </div>
-</form>
+        {% for message in messages %}
+            <p>{{message}}</p>
+        {% endfor %}
 
-{% if listing.owner == user %}
-<form action="{% url 'close_poll' %}" method="post">
-    {% csrf_token %}<input type="hidden" name="bid_id" value={{listing.id}}>
-    <div>
-        <input class="btn btn-primary" type="Submit" value="Close Poll">
-    </div>
-</form>
-{% endif %}
+        <form action="{% url 'new_bids' %}" method="post">
+        {% csrf_token %}
+            <p>Bid price:</p>
+            <div class="form-group">
+                <input size = "10" autofocus type="number" name="bid_price" placeholder={{listing.bid_price}} required>
+            </div>
+            <input type="hidden" name="bid_id" value={{listing.id}}>
+            <div>
+                <input class="btn btn-primary" type="Submit" value="Bid!">
+            </div>
+        </form>
+    
+    {% else %}
+        
+        <H3>Bid has ended, winner is {{listing.winner}}</H3>
+        
+    {%endif %}
+
+    {% if listing.owner == user %}
+        {% if listing.winner is None %}
+        <form action="{% url 'close_poll' %}" method="post">
+            {% csrf_token %}<input type="hidden" name="bid_id" value={{listing.id}}>
+            <div>
+                <input class="btn btn-primary" type="Submit" value="Close Poll">
+            </div>
+        </form>
+        {% endif %}
+    {% endif %}
+<!--  -->
 
 {% else %}
-<p><a href="{% url 'login' %}">log in to bid</a></p>
+    <p><a href="{% url 'login' %}">log in to bid</a></p>
 {% endif %}
 
-{% else %}
 
-<H3>Bid has ended, winner is {{listing.winner}}</H3>
-
-{% endif %}
 <hr>
 <h4>Comment Section</h4>
 <hr>

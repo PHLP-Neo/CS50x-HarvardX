@@ -102,9 +102,15 @@ def show_listing(request, listing_id):
     except:
         comments = False
         #print("comment gather failed")
+    try:
+        watchlist = User.objects.get(watchlist = listing)
+        #print(comments)
+    except:
+        watchlist = False
     return render(request, "auctions/ind_listing.html", {
         "listing":listing,
-        "comments":comments
+        "comments":comments,
+        "watchlist":watchlist
     })
 
 @login_required(login_url="/login?s=t")
@@ -162,16 +168,22 @@ def close_poll(request):
 
 @login_required(login_url="/login?s=t")
 def add_to_fav(request):
-    # class Favorite(models.Model):
-    # fav_user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
-    # fav_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
-    # def __str__(self):
-    #     return f"{self.fav_user} starred {self.fav_listing}"
     if request.method == "POST":
         listing_id = request.POST["bid_id"]
         listing = Auction_Listing.objects.get(id=listing_id)
         user = request.user
         user.watchlist.add(listing)
+        return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
+    else:
+        return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
+    
+@login_required(login_url="/login?s=t")
+def remove_from_fav(request):
+    if request.method == "POST":
+        listing_id = request.POST["bid_id"]
+        listing = Auction_Listing.objects.get(id=listing_id)
+        user = request.user
+        user.watchlist.remove(listing)
         return HttpResponseRedirect(reverse("show_listing", kwargs={"listing_id":listing_id}))
     else:
         return HttpResponse(f"How did you even get here? Are you pasting the url page directly?")
@@ -182,4 +194,17 @@ def my_fav(request):
     return render(request, "auctions/my_favorite.html", {
         "favorites":user.watchlist.all()
     })
-        
+
+def category(request):
+    categries = Auction_Listing.objects.values_list('category', flat=True).distinct()
+    return render(request,"auctions/category.html",{
+        "categories":categries
+    })
+
+def deep_category(request,category_name):
+    filter_result = Auction_Listing.objects.filter(category = category_name)
+    if category_name == "None":
+        filter_result = Auction_Listing.objects.filter(category__isnull = True)
+    return render(request,"auctions/deep_category.html",{
+        "listings":filter_result
+    })

@@ -34,9 +34,3 @@ class Comments(models.Model):
     def __str__(self):
         return f"{self.comment_owner}({self.comment_time}): {self.comment_text}"
     pass
-
-# class Favorite(models.Model):
-#     fav_user = models.ForeignKey(User, on_delete=models.CASCADE,blank=True, null=True,)
-#     fav_listing = models.ForeignKey(Auction_Listing, on_delete=models.CASCADE,blank=True, null=True,)
-#     def __str__(self):
-#         return f"{self.fav_listing}"    
