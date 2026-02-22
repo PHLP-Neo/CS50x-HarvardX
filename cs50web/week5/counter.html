@@ -15,14 +15,18 @@
             }
         }
 
-        document.querySelector("button").onclick = count;
+        document.addEventListener('DOMContentLoaded', 
+        function(){
+            document.querySelector("button").onclick = count;
+            //document.queryselector("Buttom").addEventListener('click',count);
+        });
 
     </script>
 </head>
 
 <body>
     <h1>0</h1>
-    <button onclick="count()">Click Here</button>
+    <button>Count</button>
 </body>
 
 </html>
