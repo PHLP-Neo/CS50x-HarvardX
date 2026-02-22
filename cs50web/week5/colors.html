@@ -12,6 +12,9 @@
                     }
                 });
                 
+                document.querySelector('select').onchange = function() {
+                    document.querySelector('#hello').style.color = this.value;
+                };
 
             });
 
@@ -23,5 +26,11 @@
         <button data-color="blue">Blue</button>
         <button data-color="green">Green</button>
         <button data-color="black">Reset</button>
+        <select>
+            <option data-color="red">Red</option>
+            <option data-color="blue">Blue</option>
+            <option data-color="green">Green</option>
+            <option data-color="black">Reset</option>
+        </select>
     </body>
 </html>
