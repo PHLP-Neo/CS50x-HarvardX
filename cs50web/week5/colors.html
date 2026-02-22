@@ -6,25 +6,12 @@
 
             document.addEventListener("DOMContentLoaded",function(){
 
-                //change font to red
-                document.querySelector("#red").onclick =function(){
-                    document.querySelector("#hello").style.color = "red";
-                }
-
-                //change font to blue
-                document.querySelector("#blue").onclick = function () {
-                    document.querySelector("#hello").style.color = "blue";
-                }
-
-                //change font to green
-                document.querySelector("#green").onclick = function () {
-                    document.querySelector("#hello").style.color = "green";
-                }
-
-                //change font to black
-                document.querySelector("#black").onclick = function () {
-                    document.querySelector("#hello").style.color = "black";
-                }
+                document.querySelectorAll('button').forEach(function(button){
+                    button.onclick = () => {
+                        document.querySelector("#hello").style.color = button.dataset.color;
+                    }
+                });
+                
 
             });
 
@@ -32,9 +19,9 @@
     </head>
     <body>
         <h1 id="hello">Hello</h1>
-        <button id="red">Red</button>
-        <button id="blue">Blue</button>
-        <button id="green">Green</button>
-        <button id="black">Reset</button>
+        <button data-color="red">Red</button>
+        <button data-color="blue">Blue</button>
+        <button data-color="green">Green</button>
+        <button data-color="black">Reset</button>
     </body>
 </html>
