@@ -22,34 +22,53 @@ function compose_email() {
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
 
-  console.log("This function is called")
+  //console.log("This function is called")
   document.querySelector('form').onsubmit = () => {
-    console.log("This function is called")
+    //console.log("This function is called")
     const compose_recipents = document.querySelector("#compose-recipients").value;
     const compose_subject = document.querySelector("#compose-subject").value;
     const compose_body = document.querySelector("#compose-body").value;
-    alert(`I have found this\nRecipents Name: ${compose_recipents}\nSubjects${compose_subject}\nBody:${compose_body}`);
-    return false;
+    //alert(`I have found this\nRecipents Name: ${compose_recipents}\nSubjects${compose_subject}\nBody:${compose_body}`);
+    
+    fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+        recipients: compose_recipents,
+        subject: compose_subject,
+        body: compose_body
+      })
+    })
+      .then(response => response.json())
+      .then(result => {
+        // Print result
+        console.log(result);
+      });
+
+    //load_mailbox('inbox');
+    //return false;
+
+
+    /*
+    How to post stuff
+
+    fetch('/emails', {
+      method: 'POST',
+      body: JSON.stringify({
+          recipients: 'baz@example.com',
+          subject: 'Meeting time',
+          body: 'How about we meet tomorrow at 3pm?'
+      })
+    })
+    .then(response => response.json())
+    .then(result => {
+        // Print result
+        console.log(result);
+    });
+    */
   }
 
   
-  /*
-  How to post stuff
-
-  fetch('/emails', {
-    method: 'POST',
-    body: JSON.stringify({
-        recipients: 'baz@example.com',
-        subject: 'Meeting time',
-        body: 'How about we meet tomorrow at 3pm?'
-    })
-  })
-  .then(response => response.json())
-  .then(result => {
-      // Print result
-      console.log(result);
-  });
-  */
+  
 }
 
 function load_mailbox(mailbox) {
