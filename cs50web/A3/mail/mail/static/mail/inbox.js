@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // By default, load the inbox
   load_mailbox('inbox');
+  
 });
 
 function compose_email() {
@@ -20,6 +21,35 @@ function compose_email() {
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
+
+  console.log("This function is called")
+  document.querySelector('form').onsubmit = () => {
+    console.log("This function is called")
+    const compose_recipents = document.querySelector("#compose-recipients").value;
+    const compose_subject = document.querySelector("#compose-subject").value;
+    const compose_body = document.querySelector("#compose-body").value;
+    alert(`I have found this\nRecipents Name: ${compose_recipents}\nSubjects${compose_subject}\nBody:${compose_body}`);
+    return false;
+  }
+
+  
+  /*
+  How to post stuff
+
+  fetch('/emails', {
+    method: 'POST',
+    body: JSON.stringify({
+        recipients: 'baz@example.com',
+        subject: 'Meeting time',
+        body: 'How about we meet tomorrow at 3pm?'
+    })
+  })
+  .then(response => response.json())
+  .then(result => {
+      // Print result
+      console.log(result);
+  });
+  */
 }
 
 function load_mailbox(mailbox) {
