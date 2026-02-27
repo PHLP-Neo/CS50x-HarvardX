@@ -118,9 +118,33 @@ function load_mailbox(mailbox) {
           sender.innerHTML = email['sender'];
           entry.appendChild(sender);
           subject = document.createElement("td");
-          hyperlink = document.createElement('a')
-          hyperlink.setAttribute("href", `emails/${email['id']}`)
+          hyperlink = document.createElement('div');
           hyperlink.innerHTML = email['subject'];
+          hyperlink.setAttribute('data-id',email['id'])
+          hyperlink.addEventListener('click', function(event) {
+            //alert(`The id of this html is ${event.currentTarget.dataset.id}!`)
+            document.querySelector('table').style.display = 'none';
+            fetch(`/emails/${event.currentTarget.dataset.id}`)
+            .then(response => response.json())
+            .then(email => {
+              console.log(email);
+              //alert ("individual email called");
+              email_sender = document.createElement("p");
+              email_sender.innerHTML = `<b>From:</b> ${email['sender']}`
+              document.querySelector('#emails-view').appendChild(email_sender);
+              email_recipents = document.createElement("p");
+              email_recipents.innerHTML = `<b>To:</b> ${email['recipients']}`
+              document.querySelector('#emails-view').appendChild(email_recipents);
+              email_subject = document.createElement("p");
+              email_subject.innerHTML = `<b>Subject:</b> ${email['subject']}`
+              document.querySelector('#emails-view').appendChild(email_subject);
+              email_time = document.createElement("p");
+              email_time.innerHTML = `<b>Timestamp:</b> ${email['timestamp']}`
+              document.querySelector('#emails-view').appendChild(email_time);
+            })
+          });
+          hyperlink.style.color = "blue";
+          hyperlink.style.textDecorationLine = "underline";
           subject.appendChild(hyperlink)
           entry.appendChild(subject);
           response_table.appendChild(entry);
