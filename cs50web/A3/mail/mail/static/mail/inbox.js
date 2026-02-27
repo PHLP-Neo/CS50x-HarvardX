@@ -30,6 +30,10 @@ function compose_email() {
     const compose_body = document.querySelector("#compose-body").value;
     //alert(`I have found this\nRecipents Name: ${compose_recipents}\nSubjects${compose_subject}\nBody:${compose_body}`);
     
+    // console.log(`recipients: ${compose_recipents}\n
+    //   subject: ${compose_subject}\n
+    //   body: ${compose_body}`)
+
     fetch('/emails', {
       method: 'POST',
       body: JSON.stringify({
@@ -79,4 +83,53 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+
+  //alert("Inside this function");
+
+
+  fetch(`/emails/${mailbox}`)
+    .then(response => response.json())
+    .then(emails => {
+      // Print emails
+      console.log(emails);
+      //alert("Inside fetch function")
+      // ... do something else with emails ...
+      if (emails.length === 0) {
+        No_email = document.createElement("H4");
+        No_email.innerHTML = "You dont have any email.";
+        document.querySelector("#emails-view").appendChild(No_email);
+      } else {
+        response_table = document.createElement("table");
+        entry = document.createElement("tr");
+        sender = document.createElement("td");
+        sender.innerHTML = '<b>Sender</b>';
+        //sender.style.
+        entry.appendChild(sender);
+        subject = document.createElement("td");
+        subject.innerHTML = "<b>Subject</b>";
+        entry.appendChild(subject);
+        response_table.appendChild(entry);
+        // for (let i = 0; i < emails.length; i++){
+        //document.querySelector("#emails-view").innerHTML = "You have email, I am working on displaying it."
+        for (let i = 0; i < emails.length; i++) {
+          let email = emails[i];
+          entry = document.createElement("tr");
+          sender = document.createElement("td");
+          sender.innerHTML = email['sender'];
+          entry.appendChild(sender);
+          subject = document.createElement("td");
+          subject.innerHTML = email['subject'];
+          entry.appendChild(subject);
+          response_table.appendChild(entry);
+        }
+        document.querySelector("#emails-view").appendChild(response_table);
+        document.querySelector("#emails-view").style.fontSize = "20px";
+        cells = document.querySelectorAll('td');
+        cells.forEach(element => {
+          element.style.borderBottom = "1px solid black";
+          element.style.padding = "5px";
+        });
+          // }
+      }
+    });
 }
