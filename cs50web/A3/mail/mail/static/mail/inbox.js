@@ -118,7 +118,10 @@ function load_mailbox(mailbox) {
           sender.innerHTML = email['sender'];
           entry.appendChild(sender);
           subject = document.createElement("td");
-          subject.innerHTML = email['subject'];
+          hyperlink = document.createElement('a')
+          hyperlink.setAttribute("href", `emails/${email['id']}`)
+          hyperlink.innerHTML = email['subject'];
+          subject.appendChild(hyperlink)
           entry.appendChild(subject);
           response_table.appendChild(entry);
         }
