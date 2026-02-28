@@ -72,7 +72,7 @@ function compose_email() {
   }
 
   
-  
+  return Promise.resolve();
 }
 
 function load_mailbox(mailbox) {
@@ -156,6 +156,22 @@ function load_mailbox(mailbox) {
               reply.setAttribute('data-subject',email['subject']);
               reply.setAttribute('data-time',email['timestamp'])
               reply.setAttribute('data-body',email['body']);
+              reply.addEventListener('click',function(event){
+                compose_email().then(()=>{
+                  //alert('This function is called!');
+                  document.querySelector('#compose-recipients').value = event.currentTarget.dataset.from;
+                  let subject = event.currentTarget.dataset.subject
+                  if (subject.slice(0, 4) !== 'Re: ') {
+                    subject = 'Re: ' + subject;
+                  }
+                  document.querySelector('#compose-subject').value = subject;
+                  let body = event.currentTarget.dataset.from;
+                  body = 'On ' + `${event.currentTarget.dataset.time} ` + body + " wrote:\n----------\n"
+                  body = body + `${event.currentTarget.dataset.body}\n----------\n`
+                  document.querySelector('#compose-body').value = body;
+                  document.querySelector('#compose-body').focus();
+                })
+              })
               document.querySelector('#emails-view').appendChild(reply);
               if (email['archived'] === false) {
                 archive = document.createElement("button");
@@ -198,7 +214,8 @@ function load_mailbox(mailbox) {
               }
               document.querySelector('#emails-view').appendChild(document.createElement('hr'));
               body_text = document.createElement('p');
-              body_text.innerHTML = `${email['body']}`
+              body_text.innerHTML = `${email['body'].replace(/\n/g,'<br>')}`
+              // the line above is taught by cs50 duck
               document.querySelector('#emails-view').appendChild(body_text);
             })
           });
