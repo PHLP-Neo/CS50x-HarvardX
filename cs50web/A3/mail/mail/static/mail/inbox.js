@@ -114,19 +114,26 @@ function load_mailbox(mailbox) {
         for (let i = 0; i < emails.length; i++) {
           let email = emails[i];
           entry = document.createElement("tr");
+          entry.setAttribute('data-id', email['id'])
           sender = document.createElement("td");
           sender.innerHTML = email['sender'];
           entry.appendChild(sender);
           subject = document.createElement("td");
           hyperlink = document.createElement('div');
           hyperlink.innerHTML = email['subject'];
-          hyperlink.setAttribute('data-id',email['id'])
-          hyperlink.addEventListener('click', function(event) {
+          //hyperlink.setAttribute('data-id',email['id'])
+          entry.addEventListener('click', function(event) {
             //alert(`The id of this html is ${event.currentTarget.dataset.id}!`)
             document.querySelector('table').style.display = 'none';
             fetch(`/emails/${event.currentTarget.dataset.id}`)
             .then(response => response.json())
             .then(email => {
+              fetch(`/emails/${email['id']}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                  read: true
+                })
+              })
               console.log(email);
               //alert ("individual email called");
               email_sender = document.createElement("p");
@@ -141,13 +148,24 @@ function load_mailbox(mailbox) {
               email_time = document.createElement("p");
               email_time.innerHTML = `<b>Timestamp:</b> ${email['timestamp']}`
               document.querySelector('#emails-view').appendChild(email_time);
+              reply = document.createElement("button");
+              reply.innerHTML = 'Reply';
+              //class="btn btn-sm btn-outline-primary"
+              reply.setAttribute('class' , "btn btn-sm btn-outline-primary")
+              document.querySelector('#emails-view').appendChild(reply);
+              //linebreak = 
+              document.querySelector('#emails-view').appendChild(document.createElement('hr'));
+              body_text = document.createElement('p');
+              body_text.innerHTML = `${email['body']}`
+              document.querySelector('#emails-view').appendChild(body_text);
             })
           });
-          hyperlink.style.color = "blue";
-          hyperlink.style.textDecorationLine = "underline";
           subject.appendChild(hyperlink)
           entry.appendChild(subject);
           response_table.appendChild(entry);
+          if (email['read']){
+            entry.style.color = 'gray'
+          }
         }
         document.querySelector("#emails-view").appendChild(response_table);
         document.querySelector("#emails-view").style.fontSize = "20px";
