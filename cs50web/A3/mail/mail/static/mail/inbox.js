@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function compose_email() {
-
+  // alert("compose function is called")
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
@@ -35,11 +35,26 @@ function compose_email() {
         body: compose_body
       })
     })
-      .then(response => response.json())
-      .then(result => {
-        // Print result
-        console.log(result);
-      });
+    // .then(response => response.json())
+    .then(response => {
+      if (response.ok) {
+        if (response.status === 204) {
+          console.log('sent!');
+          return {};
+        }
+        return response.json();
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    })
+    .then(result => {
+      // alert('this second to last function is called!')
+      console.log(result);
+      }).then(()=>{
+        // alert('this load function is called!, shoule be redirect to sent box now')
+        load_mailbox('sent');
+      })
+    return false;
   }
   return Promise.resolve();
 }
@@ -185,7 +200,7 @@ function load_mailbox(mailbox) {
             })
           });
           if (email['read']){
-            entry.style.color = 'gray'
+            entry.style.backgroundColor = 'lightgray'
           }
         }
         document.querySelector("#emails-view").appendChild(response_table);
