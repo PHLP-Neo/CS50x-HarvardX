@@ -151,9 +151,51 @@ function load_mailbox(mailbox) {
               reply = document.createElement("button");
               reply.innerHTML = 'Reply';
               //class="btn btn-sm btn-outline-primary"
-              reply.setAttribute('class' , "btn btn-sm btn-outline-primary")
+              reply.setAttribute('class' , "btn btn-sm btn-outline-primary");
+              reply.setAttribute('data-from',email['sender']);
+              reply.setAttribute('data-subject',email['subject']);
+              reply.setAttribute('data-time',email['timestamp'])
+              reply.setAttribute('data-body',email['body']);
               document.querySelector('#emails-view').appendChild(reply);
-              //linebreak = 
+              if (email['archived'] === false) {
+                archive = document.createElement("button");
+                archive.innerHTML = 'Archive';
+                archive.setAttribute('class', "btn btn-sm btn-outline-primary")
+                archive.setAttribute('data-id', email['id'])
+                archive.addEventListener('click', function (event) {
+                  fetch(`/emails/${event.currentTarget.dataset.id}`)
+                    .then(response => response.json())
+                    .then(email => {
+                      fetch(`/emails/${email['id']}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                          archived: true
+                        })
+                      }).then(() => load_mailbox('inbox'))
+                    })
+                })
+                document.querySelector('#emails-view').appendChild(archive);
+              } else {
+                unarchive = document.createElement("button");
+                unarchive.innerHTML = 'Unarchive';
+                unarchive.setAttribute('class', "btn btn-sm btn-outline-primary")
+                unarchive.setAttribute('data-id', email['id'])
+                unarchive.addEventListener('click', function (event) {
+                  fetch(`/emails/${event.currentTarget.dataset.id}`)
+                    .then(response => response.json())
+                    .then(email => {
+                      fetch(`/emails/${email['id']}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({
+                          archived: false
+                        })
+                      }).then(() => load_mailbox('inbox'))
+                    })
+                  //load_mailbox('inbox');
+                })
+                document.querySelector('#emails-view').appendChild(unarchive);
+                //
+              }
               document.querySelector('#emails-view').appendChild(document.createElement('hr'));
               body_text = document.createElement('p');
               body_text.innerHTML = `${email['body']}`
