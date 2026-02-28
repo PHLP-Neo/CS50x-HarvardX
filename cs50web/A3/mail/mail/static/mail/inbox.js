@@ -16,24 +16,17 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
-
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
-
   //console.log("This function is called")
   document.querySelector('form').onsubmit = () => {
     //console.log("This function is called")
     const compose_recipents = document.querySelector("#compose-recipients").value;
     const compose_subject = document.querySelector("#compose-subject").value;
     const compose_body = document.querySelector("#compose-body").value;
-    //alert(`I have found this\nRecipents Name: ${compose_recipents}\nSubjects${compose_subject}\nBody:${compose_body}`);
-    
-    // console.log(`recipients: ${compose_recipents}\n
-    //   subject: ${compose_subject}\n
-    //   body: ${compose_body}`)
-
+    //alert(`I have found this\nRecipents Name: ${compose_recipents}\nSubjects${compose_subject}\nBody:${compose_body}`)
     fetch('/emails', {
       method: 'POST',
       body: JSON.stringify({
@@ -47,46 +40,17 @@ function compose_email() {
         // Print result
         console.log(result);
       });
-
-    //load_mailbox('inbox');
-    //return false;
-
-
-    /*
-    How to post stuff
-
-    fetch('/emails', {
-      method: 'POST',
-      body: JSON.stringify({
-          recipients: 'baz@example.com',
-          subject: 'Meeting time',
-          body: 'How about we meet tomorrow at 3pm?'
-      })
-    })
-    .then(response => response.json())
-    .then(result => {
-        // Print result
-        console.log(result);
-    });
-    */
   }
-
-  
   return Promise.resolve();
 }
 
 function load_mailbox(mailbox) {
-  
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
-
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
-
   //alert("Inside this function");
-
-
   fetch(`/emails/${mailbox}`)
     .then(response => response.json())
     .then(emails => {
@@ -103,14 +67,14 @@ function load_mailbox(mailbox) {
         entry = document.createElement("tr");
         sender = document.createElement("td");
         sender.innerHTML = '<b>Sender</b>';
-        //sender.style.
         entry.appendChild(sender);
         subject = document.createElement("td");
         subject.innerHTML = "<b>Subject</b>";
         entry.appendChild(subject);
+        time = document.createElement("td");
+        time.innerHTML = "<b>Time</b>";
+        entry.appendChild(time);
         response_table.appendChild(entry);
-        // for (let i = 0; i < emails.length; i++){
-        //document.querySelector("#emails-view").innerHTML = "You have email, I am working on displaying it."
         for (let i = 0; i < emails.length; i++) {
           let email = emails[i];
           entry = document.createElement("tr");
@@ -119,9 +83,12 @@ function load_mailbox(mailbox) {
           sender.innerHTML = email['sender'];
           entry.appendChild(sender);
           subject = document.createElement("td");
-          hyperlink = document.createElement('div');
-          hyperlink.innerHTML = email['subject'];
-          //hyperlink.setAttribute('data-id',email['id'])
+          subject.innerHTML = email['subject'];
+          entry.appendChild(subject);
+          time = document.createElement("td");
+          time.innerHTML = email['timestamp'];
+          entry.appendChild(time);
+          response_table.appendChild(entry);
           entry.addEventListener('click', function(event) {
             //alert(`The id of this html is ${event.currentTarget.dataset.id}!`)
             document.querySelector('table').style.display = 'none';
@@ -207,10 +174,8 @@ function load_mailbox(mailbox) {
                         })
                       }).then(() => load_mailbox('inbox'))
                     })
-                  //load_mailbox('inbox');
                 })
                 document.querySelector('#emails-view').appendChild(unarchive);
-                //
               }
               document.querySelector('#emails-view').appendChild(document.createElement('hr'));
               body_text = document.createElement('p');
@@ -219,9 +184,6 @@ function load_mailbox(mailbox) {
               document.querySelector('#emails-view').appendChild(body_text);
             })
           });
-          subject.appendChild(hyperlink)
-          entry.appendChild(subject);
-          response_table.appendChild(entry);
           if (email['read']){
             entry.style.color = 'gray'
           }
@@ -233,7 +195,6 @@ function load_mailbox(mailbox) {
           element.style.borderBottom = "1px solid black";
           element.style.padding = "5px";
         });
-          // }
       }
     });
 }
