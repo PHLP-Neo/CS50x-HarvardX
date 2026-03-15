@@ -61,3 +61,19 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+def following(request):
+    return render(request, "network/following.html")
+
+    pass
+
+def new_post(request):
+    return render(request, "network/new_post.html")
+
+    pass
+
+def userstats(request,user_id):
+    return render(request, "network/userstats.html",{
+        "user_id":user_id
+    })
+    pass
